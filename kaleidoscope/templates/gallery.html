@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>{{ gallery.title }}</title>
+{% endblock %}
+
+{% block nav %}
+    <h1 class="nav__title">{{ gallery.title }}</h1>
+    <link rel="stylesheet" href="assets/kaleidoscope.css">
+{% endblock %}
+
+{% block content %}
+    <div class="gallery">
+    {% for year, albums in gallery.years %}
+        <div class="year gallery__row">
+            <h2 class="year__title">{{ year }}</h2>
+            {% for album in albums %}
+                <div class="album-link">
+                    <a href="{{ album.path.name }}" class="album-link__title">{{ album.meta.title }}</a>
+                    <span class="album-link__date">{{ album.meta.date | formatdate }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

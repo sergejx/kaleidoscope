@@ -1,0 +1,78 @@
+html {
+    overflow-y: scroll;
+}
+
+body {
+    background-color: #2E3436;
+    color: #eeeeec;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    margin: 0;
+}
+
+.nav {
+    background-color: #232729;
+    padding: 8px 12px 10px;
+    }
+
+    .nav__title {
+        font-weight: normal;
+        font-size: 26px;
+        margin: 0;
+    }
+
+.footer {
+    margin: 10px;
+    font-size: 80%;
+    color: #777;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    }
+    .gallery__row {
+        width: 240px;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+.year {
+    padding-bottom: 15px;
+    }
+    .year__title {
+        font-size: 20px;
+        font-weight: normal;
+        margin: 20px 0 15px;
+    }
+
+.album-link {
+    margin-bottom: 15px;
+    }
+    .album-link__date {
+        font-size: 80%;
+        margin-left: 5px;
+        color: #777;
+    }
+
+.thumbnail {
+    box-sizing: border-box;
+    }
+    .thumbnail:hover {
+        border: 2px solid #ffb02f;
+    }
+
+img {
+   border: 0;
+}
+
+a:link {
+   color: #ffb02f;
+}
+
+a:visited {
+   color: #e88000;
+}
+
+a:hover {
+   color: #ffcc7a;
+}

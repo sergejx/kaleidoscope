@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>{{ album_info.title }}</title>
+    <link rel="stylesheet" href="../assets/jg/justifiedGallery.min.css">
+    <link rel="stylesheet" href="../assets/pswp/photoswipe.css">
+    <link rel="stylesheet" href="../assets/pswp/default-skin/default-skin.css">
+    <link rel="stylesheet" href="../assets/kaleidoscope.css">
+    <script src="../assets/jquery-3.slim.min.js"></script>
+    <script src="../assets/jg/jquery.justifiedGallery.min.js"></script>
+    <script src="../assets/pswp/photoswipe.min.js"></script>
+    <script src="../assets/pswp/photoswipe-ui-default.min.js"></script>
+    <script src="../assets/kaleidoscope.js"></script>
+{% endblock %}
+
+{% block nav %}
+        <a href="..">{{ gallery.title }}</a>
+        <h1 class="nav__title">{{ album_info.title }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="main">
+        <div class="album">
+        {% for photo in photos %}
+            <a href="{{ photo.large.url }}" class="thumbnail">
+                <img src="{{ photo.thumb.url }}"
+                     alt="{{ photo.caption }}" title="{{ photo.title }}"
+                     width="{{ photo.thumb.size[0] }}" height="{{ photo.thumb.size[1] }}"
+                     data-full-width="{{ photo.large.size[0] }}" data-full-height="{{ photo.large.size[1] }}">
+            </a>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
