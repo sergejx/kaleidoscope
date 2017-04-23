@@ -3,6 +3,7 @@ from datetime import datetime
 from itertools import groupby
 from pathlib import Path
 from subprocess import run
+from typing import Any, Dict, List
 
 import imagesize
 
@@ -13,7 +14,7 @@ class Gallery:
     """Photo gallery -- collection of albums."""
     CONFIG_FILE = 'gallery.ini'
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path) -> None:
         self.path = path
 
         config = ConfigParser()
@@ -50,12 +51,12 @@ class Album:
     """Photo album."""
     INDEX_FILE = 'album.ini'
 
-    def __init__(self, gallery, path: Path):
+    def __init__(self, gallery, path: Path) -> None:
         self.gallery = gallery
         self.path = path
         self.name = path.name
-        self.meta = {}
-        self.photos = []
+        self.meta = {}    # type: Dict[str, Any]
+        self.photos = []  # type: List[Photo]
         index_path = self.path.joinpath(self.INDEX_FILE)
         self._parse_index(index_path)
         if 'date' in self.meta:
@@ -93,7 +94,7 @@ class Album:
 
 class Photo:
     """Photography with metadata and different sizes."""
-    def __init__(self, path: Path, name: str, title: str):
+    def __init__(self, path: Path, name: str, title: str) -> None:
         self.path = path
         self.name = name
         self.caption, _, rest = title.partition('|')
@@ -109,7 +110,7 @@ class Photo:
 
 class ResizedImage:
     """Resized version of the photo."""
-    def __init__(self, photo: Photo, size_name: str, geometry: str):
+    def __init__(self, photo: Photo, size_name: str, geometry: str) -> None:
         self.photo = photo
         self.url = '{}/{}'.format(size_name, photo.name)
         self.size_name = size_name
