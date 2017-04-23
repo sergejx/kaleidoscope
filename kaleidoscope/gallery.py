@@ -80,8 +80,10 @@ class Album:
     def generate(self, output_base: Path):
         print("Generating album {}".format(self.name))
         album_output = output_base.joinpath(self.name)
-        album_output.mkdir(exist_ok=True)
         self._resize_all(album_output)
+        self.generate_page(album_output)
+
+    def generate_page(self, album_output: Path):
         generator.render('album.html', album_output.joinpath('index.html'),
                          {'album_info': self.meta,
                           'photos': self.photos,
