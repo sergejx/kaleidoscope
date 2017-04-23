@@ -43,7 +43,7 @@ class Gallery:
         generator.render('gallery.html', output_path.joinpath("index.html"),
                          {'gallery': self})
         for album in self.albums:
-            album.generate(output_path, generator)
+            album.generate(output_path)
 
 
 class Album:
@@ -76,7 +76,7 @@ class Album:
             photo = Photo(image_path, filename, caption)
             self.photos.append(photo)
 
-    def generate(self, output_base: Path, generator):
+    def generate(self, output_base: Path):
         print("Generating album {}".format(self.name))
         album_output = output_base.joinpath(self.name)
         album_output.mkdir(exist_ok=True)
