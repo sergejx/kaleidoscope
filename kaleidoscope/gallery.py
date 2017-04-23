@@ -124,7 +124,7 @@ class ResizedImage:
         path = album_output.joinpath(self.size_name, self.photo.name)
         if not path.exists():
             print("  resizing " + self.photo.name)
-            path.parent.mkdir(exist_ok=True)
+            path.parent.mkdir(parents=True, exist_ok=True)
             run(['convert', str(self.photo.path),
                  '-resize', self.geometry,
                  '-auto-orient',

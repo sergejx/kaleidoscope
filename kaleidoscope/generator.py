@@ -9,7 +9,7 @@ def formatdate(value, fmt='%d. %B'):
 
 
 def render(template_name: str, file_path: Path, context: dict) -> None:
-    file_path.parent.mkdir(exist_ok=True)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
     template = _env.get_template(template_name)
     with file_path.open('w') as output:
         output.write(template.render(context))
