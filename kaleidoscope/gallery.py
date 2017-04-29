@@ -5,6 +5,7 @@ from pathlib import Path
 from subprocess import run
 from typing import Any, Dict, List
 
+import click
 import imagesize
 
 from kaleidoscope import generator
@@ -107,8 +108,11 @@ class Album:
                          {'album': self, 'gallery': self.gallery})
 
     def _resize_all(self, album_output: Path):
-        for photo in self.photos:
-            photo.resize(album_output)
+        photos_for_resize = [p for p in self.photos if p.needs_resize(album_output)]
+        if photos_for_resize:
+            with click.progressbar(photos_for_resize) as bar:
+                for photo in bar:  # type: ignore
+                    photo.resize(album_output)
 
 
 class Photo:
@@ -121,6 +125,10 @@ class Photo:
 
         self.thumb = ResizedImage(self, 'thumb', '300x200')
         self.large = ResizedImage(self, 'large', '1500x1000')
+
+    def needs_resize(self, album_output: Path) -> bool:
+        return not self.large.exists(album_output) \
+                or not self.thumb.exists(album_output)
 
     def resize(self, out_dir: Path):
         self.large.resize(out_dir)
@@ -136,11 +144,15 @@ class ResizedImage:
         self.geometry = geometry
         self.size = (0, 0)
 
+    def exists(self, album_output: Path) -> bool:
+        path = album_output.joinpath(self.size_name, self.photo.name)
+        self.size = imagesize.get(str(path))  # TODO: Move this to __init__
+        return path.exists()
+
     def resize(self, album_output: Path):
         """Actually resize the image."""
         path = album_output.joinpath(self.size_name, self.photo.name)
         if not path.exists():
-            print("  resizing " + self.photo.name)
             path.parent.mkdir(parents=True, exist_ok=True)
             run(['convert', str(self.photo.path),
                  '-resize', self.geometry,
