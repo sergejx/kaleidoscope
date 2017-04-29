@@ -10,6 +10,18 @@ import imagesize
 from kaleidoscope import generator
 
 
+class GalleryConfigParser(ConfigParser):
+    """ConfigParser with settings for gallery configuration files."""
+    def __init__(self) -> None:
+        super().__init__(allow_no_value=True)
+
+    def optionxform(self, option: str) -> str:
+        # Keep file names keys with '.' case sensitive
+        if '.' in option:
+            return option
+        else:
+            return option.lower()
+
 class Gallery:
     """Photo gallery -- collection of albums."""
     CONFIG_FILE = 'gallery.ini'
@@ -17,7 +29,7 @@ class Gallery:
     def __init__(self, path: Path) -> None:
         self.path = path
 
-        config = ConfigParser()
+        config = GalleryConfigParser()
         config.read(str(path.joinpath(self.CONFIG_FILE)))
 
         self.title = config.get('gallery', 'title') or "Photo Gallery"
@@ -66,7 +78,7 @@ class Album:
         return path.joinpath(cls.INDEX_FILE).exists()
 
     def _parse_index(self, index_path: Path):
-        config = ConfigParser(allow_no_value=True)
+        config = GalleryConfigParser()
         config.read(str(index_path))
 
         if 'title' in config['album']:
