@@ -16,8 +16,8 @@
             <h2 class="year__title">{{ year }}</h2>
             {% for album in albums %}
                 <div class="album-link">
-                    <a href="{{ album.path.name }}" class="album-link__title">{{ album.meta.title }}</a>
-                    <span class="album-link__date">{{ album.meta.date | formatdate }}</span>
+                    <a href="{{ album.path.name }}" class="album-link__title">{{ album.title }}</a>
+                    <span class="album-link__date">{{ album.date | formatdate }}</span>
                 </div>
             {% endfor %}
         </div>

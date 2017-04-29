@@ -29,12 +29,12 @@ class Gallery:
     def _read_albums(self):
         albums = [Album(self, child) for child in self.path.iterdir()
                   if Album.is_album(child)]
-        albums.sort(key=lambda a: a.meta['date'], reverse=True)
+        albums.sort(key=lambda a: a.date, reverse=True)
         return albums
 
     def _group_by_years(self, albums):
         years = []
-        for year, albums in groupby(albums, lambda a: a.meta['date'].year):
+        for year, albums in groupby(albums, lambda a: a.date.year):
             years.append((year, list(albums)))
         return years
 
@@ -55,12 +55,11 @@ class Album:
         self.gallery = gallery
         self.path = path
         self.name = path.name
-        self.meta = {}    # type: Dict[str, Any]
+        self.title = None # type: str
+        self.date = None  # type: datetime
         self.photos = []  # type: List[Photo]
         index_path = self.path.joinpath(self.INDEX_FILE)
         self._parse_index(index_path)
-        if 'date' in self.meta:
-            self.meta['date'] = datetime.strptime(self.meta['date'], '%Y-%m-%d')
 
     @classmethod
     def is_album(cls, path: Path):
@@ -69,8 +68,16 @@ class Album:
     def _parse_index(self, index_path: Path):
         config = ConfigParser(allow_no_value=True)
         config.read(str(index_path))
-        for key, value in config['album'].items():
-            self.meta[key] = value
+
+        if 'title' in config['album']:
+            self.title = config['album']['title']
+        else:
+            self.title = self.name
+        if 'date' in config['album']:
+            self.date = datetime.strptime(config['album']['date'], '%Y-%m-%d')
+        else:
+            self.date = datetime.fromtimestamp(self.path.stat().st_ctime)
+
         for filename in config.options('photos'):
             image_path = self.path.joinpath(filename)
             caption = config['photos'][filename] or ""
@@ -85,9 +92,7 @@ class Album:
 
     def generate_page(self, album_output: Path):
         generator.render('album.html', album_output.joinpath('index.html'),
-                         {'album_info': self.meta,
-                          'photos': self.photos,
-                          'gallery': self.gallery})
+                         {'album': self, 'gallery': self.gallery})
 
     def _resize_all(self, album_output: Path):
         for photo in self.photos:
