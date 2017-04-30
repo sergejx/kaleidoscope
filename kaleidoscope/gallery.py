@@ -23,6 +23,7 @@ class GalleryConfigParser(ConfigParser):
         else:
             return option.lower()
 
+
 class Gallery:
     """Photo gallery -- collection of albums."""
     CONFIG_FILE = 'gallery.ini'
@@ -95,7 +96,7 @@ class Album:
 
         for filename in config.options('photos'):
             caption = config['photos'][filename] or ""
-            photo = Photo(self, filename, caption)
+            photo = Photo(self.output / filename, self.output, caption)
             self.photos.append(photo)
 
     def generate(self) -> None:
@@ -117,15 +118,13 @@ class Album:
 
 class Photo:
     """Photography with metadata and different sizes."""
-    def __init__(self, album: Album, name: str, title: str) -> None:
-        self.album = album
-        self.path = album.path.joinpath(name)
-        self.name = name
+    def __init__(self, src: Path, out_dir:Path, title: str) -> None:
+        self.path = src
         self.caption, _, rest = title.partition('|')
         self.title = self.caption + rest
 
-        self.thumb = ResizedImage(self, 'thumb', '300x200')
-        self.large = ResizedImage(self, 'large', '1500x1000')
+        self.thumb = ResizedImage(self.path, out_dir, 'thumb', '300x200>')
+        self.large = ResizedImage(self.path, out_dir, 'large', '1500x1000>')
 
     def needs_resize(self) -> bool:
         return not self.large.exists() or not self.thumb.exists()
@@ -137,11 +136,11 @@ class Photo:
 
 class ResizedImage:
     """Resized version of the photo."""
-    def __init__(self, photo: Photo, size_name: str, geometry: str) -> None:
-        self.photo = photo
-        self.path = photo.album.output.joinpath(size_name, photo.name)
-        self.url = '{}/{}'.format(size_name, photo.name)
-        self.size_name = size_name
+    def __init__(self, src: Path, out_dir: Path,
+                 size_name: str, geometry: str) -> None:
+        self.src = src
+        self.path = out_dir / size_name / src.name
+        self.url = '{}/{}'.format(size_name, src.name)
         self.geometry = geometry
         self.size = self.read_size() if self.exists() else (0, 0)
 
@@ -155,7 +154,7 @@ class ResizedImage:
         """Actually resize the image."""
         if not self.exists():
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            run(['convert', str(self.photo.path),
+            run(['convert', str(self.src),
                  '-resize', self.geometry,
                  '-auto-orient',
                  str(self.path)])
