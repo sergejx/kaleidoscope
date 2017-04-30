@@ -1,7 +1,7 @@
 all: typecheck test
 
 typecheck:
-	mypy --ignore-missing-imports -p kaleidoscope
+	mypy --check-untyped-defs -p kaleidoscope
 
 test:
 	python -m unittest tests
