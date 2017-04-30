@@ -21,8 +21,8 @@ def cli(ctx, gallery):
 @cli.command()
 def build():
     """Build gallery."""
-    gallery = Gallery(Path(gallery_path))
-    gallery.generate(Path(gallery_path, "output"))
+    gallery = Gallery(Path(gallery_path), Path(gallery_path, "output"))
+    gallery.generate()
 
 
 @cli.command(name='init-gallery')

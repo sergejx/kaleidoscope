@@ -3,10 +3,10 @@ from datetime import datetime
 from itertools import groupby
 from pathlib import Path
 from subprocess import run
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import click
-import imagesize
+import imagesize  # type: ignore
 
 from kaleidoscope import generator
 
@@ -27,11 +27,12 @@ class Gallery:
     """Photo gallery -- collection of albums."""
     CONFIG_FILE = 'gallery.ini'
 
-    def __init__(self, path: Path) -> None:
-        self.path = path
+    def __init__(self, src_path: Path, out_path: Path) -> None:
+        self.path = src_path
+        self.output = out_path
 
         config = GalleryConfigParser()
-        config.read(str(path.joinpath(self.CONFIG_FILE)))
+        config.read(str(self.path.joinpath(self.CONFIG_FILE)))
 
         self.title = config.get('gallery', 'title') or "Photo Gallery"
         self.author = config.get('gallery', 'author')
@@ -51,13 +52,13 @@ class Gallery:
             years.append((year, list(albums)))
         return years
 
-    def generate(self, output_path: Path):
-        output_path.mkdir(exist_ok=True)
-        generator.copy_assets(output_path)
-        generator.render('gallery.html', output_path.joinpath("index.html"),
+    def generate(self) -> None:
+        self.output.mkdir(exist_ok=True)
+        generator.copy_assets(self.output)
+        generator.render('gallery.html', self.output.joinpath("index.html"),
                          {'gallery': self})
         for album in self.albums:
-            album.generate(output_path)
+            album.generate()
 
 
 class Album:
@@ -68,6 +69,7 @@ class Album:
         self.gallery = gallery
         self.path = path
         self.name = path.name
+        self.output = gallery.output.joinpath(self.name)
         self.title = None # type: str
         self.date = None  # type: datetime
         self.photos = []  # type: List[Photo]
@@ -92,33 +94,32 @@ class Album:
             self.date = datetime.fromtimestamp(self.path.stat().st_ctime)
 
         for filename in config.options('photos'):
-            image_path = self.path.joinpath(filename)
             caption = config['photos'][filename] or ""
-            photo = Photo(image_path, filename, caption)
+            photo = Photo(self, filename, caption)
             self.photos.append(photo)
 
-    def generate(self, output_base: Path):
+    def generate(self) -> None:
         print("Generating album {}".format(self.name))
-        album_output = output_base.joinpath(self.name)
-        self._resize_all(album_output)
-        self.generate_page(album_output)
+        self._resize_all()
+        self.generate_page()
 
-    def generate_page(self, album_output: Path):
-        generator.render('album.html', album_output.joinpath('index.html'),
+    def generate_page(self) -> None:
+        generator.render('album.html', self.output.joinpath('index.html'),
                          {'album': self, 'gallery': self.gallery})
 
-    def _resize_all(self, album_output: Path):
-        photos_for_resize = [p for p in self.photos if p.needs_resize(album_output)]
+    def _resize_all(self) -> None:
+        photos_for_resize = [p for p in self.photos if p.needs_resize()]
         if photos_for_resize:
             with click.progressbar(photos_for_resize) as bar:
                 for photo in bar:  # type: ignore
-                    photo.resize(album_output)
+                    photo.resize()
 
 
 class Photo:
     """Photography with metadata and different sizes."""
-    def __init__(self, path: Path, name: str, title: str) -> None:
-        self.path = path
+    def __init__(self, album: Album, name: str, title: str) -> None:
+        self.album = album
+        self.path = album.path.joinpath(name)
         self.name = name
         self.caption, _, rest = title.partition('|')
         self.title = self.caption + rest
@@ -126,39 +127,39 @@ class Photo:
         self.thumb = ResizedImage(self, 'thumb', '300x200')
         self.large = ResizedImage(self, 'large', '1500x1000')
 
-    def needs_resize(self, album_output: Path) -> bool:
-        return not self.large.exists(album_output) \
-                or not self.thumb.exists(album_output)
+    def needs_resize(self) -> bool:
+        return not self.large.exists() or not self.thumb.exists()
 
-    def resize(self, out_dir: Path):
-        self.large.resize(out_dir)
-        self.thumb.resize(out_dir)
+    def resize(self) -> None:
+        self.large.resize()
+        self.thumb.resize()
 
 
 class ResizedImage:
     """Resized version of the photo."""
     def __init__(self, photo: Photo, size_name: str, geometry: str) -> None:
         self.photo = photo
+        self.path = photo.album.output.joinpath(size_name, photo.name)
         self.url = '{}/{}'.format(size_name, photo.name)
         self.size_name = size_name
         self.geometry = geometry
-        self.size = (0, 0)
+        self.size = self.read_size() if self.exists() else (0, 0)
 
-    def exists(self, album_output: Path) -> bool:
-        path = album_output.joinpath(self.size_name, self.photo.name)
-        self.size = imagesize.get(str(path))  # TODO: Move this to __init__
-        return path.exists()
+    def exists(self) -> bool:
+        return self.path.exists()
 
-    def resize(self, album_output: Path):
+    def read_size(self) -> Tuple[int, int]:
+        return imagesize.get(str(self.path))
+
+    def resize(self) -> None:
         """Actually resize the image."""
-        path = album_output.joinpath(self.size_name, self.photo.name)
-        if not path.exists():
-            path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.exists():
+            self.path.parent.mkdir(parents=True, exist_ok=True)
             run(['convert', str(self.photo.path),
                  '-resize', self.geometry,
                  '-auto-orient',
-                 str(path)])
-        self.size = imagesize.get(str(path))
+                 str(self.path)])
+            self.size = self.read_size()
 
 
 def generate_gallery_ini(gallery_path: Path):
