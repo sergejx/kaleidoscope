@@ -81,7 +81,7 @@ class Album:
 
         for filename in config.options('photos'):
             caption = config['photos'][filename] or ""
-            photo = Photo(self.output / filename, self.output, caption)
+            photo = Photo(self.path / filename, self.output, caption)
             self.photos.append(photo)
 
     def generate(self) -> None:
