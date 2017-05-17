@@ -1,14 +1,45 @@
-import unittest
 from configparser import ConfigParser
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
-
-from kaleidoscope.gallery import generate_gallery_ini, generate_album_ini
 from shutil import copyfile
 from tempfile import TemporaryDirectory
+from unittest import TestCase, mock
+
+from kaleidoscope import gallery
 
 
-class TestInit(unittest.TestCase):
+class TestAlbum(TestCase):
+    maxDiff = None
+    GALLERY_PATH = Path(__file__).parent / 'testing-gallery'
+    ALBUM_PATH = GALLERY_PATH / 'testing-album'
+    OUTPUT_PATH = GALLERY_PATH / 'output'
+    ALBUM_OUTPUT = OUTPUT_PATH / 'testing-album'
+
+    @mock.patch('kaleidoscope.photo.Photo.__init__')
+    def test_read_album(self, mock_photo_init):
+        mock_photo_init.return_value = None
+        gallery_mock = mock.MagicMock()
+        gallery_mock.output = self.OUTPUT_PATH
+
+        album = gallery.Album(gallery_mock, self.ALBUM_PATH)
+
+        self.assertTrue(mock_photo_init.called)
+        self.assertEqual(album.name, 'testing-album')
+        self.assertEqual(album.path, self.ALBUM_PATH)
+        self.assertEqual(album.output, self.ALBUM_OUTPUT)
+        self.assertEqual(album.title, "Testing Album")
+        self.assertEqual(album.date, datetime(2017, 5, 15, 0, 0))
+        self.assertEqual(len(album.photos), 4)
+        self.assertListEqual(mock_photo_init.call_args_list, [
+            mock.call(self.ALBUM_PATH / '1.jpg', self.ALBUM_OUTPUT, ''),
+            mock.call(self.ALBUM_PATH / '2.jpg', self.ALBUM_OUTPUT, 'Caption'),
+            mock.call(self.ALBUM_PATH / '3.jpg', self.ALBUM_OUTPUT, 'Long caption'),
+            mock.call(self.ALBUM_PATH / '4.jpg', self.ALBUM_OUTPUT,
+                      'Long caption| with hidden part')
+        ])
+
+
+class TestInit(TestCase):
     IMAGES = ['blank-1.jpg', 'blank-2.JPG', 'blank-3.jpeg', 'blank-4.JPEG']
 
     def setUp(self):
@@ -24,7 +55,7 @@ class TestInit(unittest.TestCase):
         self.temp.cleanup()
 
     def test_init_gallery(self):
-        generate_gallery_ini(self.gallery_path)
+        gallery.generate_gallery_ini(self.gallery_path)
         ini_path = self.gallery_path / 'gallery.ini'
         self.assertTrue(ini_path.exists())
         config = ConfigParser()
@@ -33,7 +64,7 @@ class TestInit(unittest.TestCase):
         self.assertEqual(config['gallery']['author'], 'Anonymous')
 
     def test_init_album(self):
-        generate_album_ini(self.album_path)
+        gallery.generate_album_ini(self.album_path)
         ini_path = self.album_path / 'album.ini'
         self.assertTrue(ini_path.exists())
         config = ConfigParser(allow_no_value=True)
