@@ -15,7 +15,7 @@
 
 {% block content %}
     <div class="main">
-        <div class="album">
+        <div class="album justified-gallery">
         {% for photo in album.photos %}
             <a href="{{ photo.large.url }}" class="thumbnail">
                 <img src="{{ photo.thumb.url }}"
