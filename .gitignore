@@ -3,3 +3,5 @@
 __pycache__
 kaleidoscope.egg-info/
 venv
+node_modules
+kaleidoscope/assets/vendor/
