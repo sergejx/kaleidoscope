@@ -1,9 +1,9 @@
 import unittest
 from pathlib import Path
-
-from kaleidoscope.photo import Photo
 from shutil import copyfile
 from tempfile import TemporaryDirectory
+
+from kaleidoscope.photo import Photo
 
 
 class TestPhoto(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestPhoto(unittest.TestCase):
         self.photo_path = Path(self.temp.name, 'blank.jpg')
         self.output_path = Path(self.temp.name, 'output')
         self.output_path.mkdir()
-        src_image = Path(__file__).parent / 'blank.jpg'
+        src_image = Path(__file__).parent / 'data' / 'photo.jpg'
         copyfile(str(src_image), str(self.photo_path))
 
     def tearDown(self):
@@ -37,5 +37,7 @@ class TestPhoto(unittest.TestCase):
         self.assertFalse(photo.needs_resize())
         self.assertEqual(photo.large.url, 'large/blank.jpg')
         self.assertEqual(photo.thumb.url, 'thumb/blank.jpg')
-        self.assertEqual(photo.large.size, (1, 1))  # Not larger then original
-        self.assertEqual(photo.thumb.size, (1, 1))
+        self.assertLessEqual(photo.large.size[0], 1500)
+        self.assertLessEqual(photo.large.size[1], 1000)
+        self.assertLessEqual(photo.thumb.size[0], 300)
+        self.assertLessEqual(photo.thumb.size[1], 200)
