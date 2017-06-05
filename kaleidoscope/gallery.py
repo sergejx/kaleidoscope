@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 
 import click
-from kaleidoscope import generator
+from kaleidoscope.generator import Generator
 from kaleidoscope.config import GalleryConfigParser
 from kaleidoscope.photo import Photo
 
@@ -13,9 +13,10 @@ class Gallery:
     """Photo gallery -- collection of albums."""
     CONFIG_FILE = 'gallery.ini'
 
-    def __init__(self, src_path: Path, out_path: Path) -> None:
+    def __init__(self, src_path: Path, out_path: Path, generator: Generator) -> None:
         self.path = src_path
         self.output = out_path
+        self.generator = generator
 
         config = GalleryConfigParser()
         config.read(str(self.path.joinpath(self.CONFIG_FILE)))
@@ -27,7 +28,7 @@ class Gallery:
         self.years = self._group_by_years(self.albums)
 
     def _read_albums(self):
-        albums = [Album(self, child) for child in self.path.iterdir()
+        albums = [Album(self, child, self.generator) for child in self.path.iterdir()
                   if Album.is_album(child)]
         albums.sort(key=lambda a: a.date, reverse=True)
         return albums
@@ -40,8 +41,8 @@ class Gallery:
 
     def generate(self) -> None:
         self.output.mkdir(exist_ok=True)
-        generator.copy_assets(self.output)
-        generator.render('gallery.html', self.output.joinpath("index.html"),
+        self.generator.copy_assets(self.output)
+        self.generator.render('gallery.html', self.output.joinpath("index.html"),
                          {'gallery': self})
         for album in self.albums:
             album.generate()
@@ -51,9 +52,10 @@ class Album:
     """Photo album."""
     INDEX_FILE = 'album.ini'
 
-    def __init__(self, gallery, path: Path) -> None:
+    def __init__(self, gallery: Gallery, path: Path, generator: Generator) -> None:
         self.gallery = gallery
         self.path = path
+        self.generator = generator
         self.name = path.name
         self.output = gallery.output.joinpath(self.name)
         self.title = None # type: str
@@ -90,7 +92,7 @@ class Album:
         self.generate_page()
 
     def generate_page(self) -> None:
-        generator.render('album.html', self.output.joinpath('index.html'),
+        self.generator.render('album.html', self.output.joinpath('index.html'),
                          {'album': self, 'gallery': self.gallery})
 
     def _resize_all(self) -> None:
@@ -107,7 +109,7 @@ def generate_gallery_ini(gallery_path: Path):
     print("gallery.ini generated")
 
 
-def generate_album_ini(album_path: Path):
+def generate_album_ini(album_path: Path, generator: Generator):
     album_ini_path = album_path.joinpath('album.ini')
 
     image_suffixes = ['.jpg', '.jpeg', '.png', '.gif']

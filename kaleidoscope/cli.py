@@ -4,6 +4,7 @@ import click
 import locale
 
 from kaleidoscope.gallery import Gallery, generate_gallery_ini, generate_album_ini
+from kaleidoscope.generator import Generator
 
 gallery_path = "."
 
@@ -21,7 +22,8 @@ def cli(ctx, gallery):
 @cli.command()
 def build():
     """Build gallery."""
-    gallery = Gallery(Path(gallery_path), Path(gallery_path, "output"))
+    gallery = Gallery(Path(gallery_path), Path(gallery_path, "output"),
+                      Generator())
     gallery.generate()
 
 
@@ -36,4 +38,4 @@ def init_gallery():
                 type=click.Path(exists=True, file_okay=False, dir_okay=True))
 def init_album(directory):
     """Generate album configuration file with list of photos."""
-    generate_album_ini(Path(gallery_path).joinpath(directory))
+    generate_album_ini(Path(gallery_path).joinpath(directory), Generator())

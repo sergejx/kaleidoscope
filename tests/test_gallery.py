@@ -6,6 +6,7 @@ from unittest import TestCase, mock
 
 from kaleidoscope import gallery
 from kaleidoscope.config import GalleryConfigParser
+from kaleidoscope.generator import Generator
 
 
 class TestInit(TestCase):
@@ -21,7 +22,7 @@ class TestInit(TestCase):
         """generate_album_ini function should generate configuration with all photos."""
         with TestingGallery(with_album_conf=False) as gallery_path:
             album_path = gallery_path / 'testing-album'
-            gallery.generate_album_ini(album_path)
+            gallery.generate_album_ini(album_path, Generator())
             self.assert_valid_configuration(album_path / 'album.ini', {
                 'album': ['title', 'date'],
                 'photos': TestingGallery.PHOTOS
@@ -51,7 +52,7 @@ class TestAlbum(TestCase):
             album_path = gallery_path / TestingGallery.ALBUM_NAME
             album_output = gallery_path / 'output' / TestingGallery.ALBUM_NAME
 
-            album = gallery.Album(gallery_mock, album_path)
+            album = gallery.Album(gallery_mock, album_path, Generator())
 
             self.assertEqual(album.name, TestingGallery.ALBUM_NAME)
             self.assertEqual(album.path, album_path)
