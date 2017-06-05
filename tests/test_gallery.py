@@ -39,6 +39,30 @@ class TestInit(TestCase):
                 self.assertTrue(config.has_option(section, option))
 
 
+class TestGallery(TestCase):
+    OUTPUT_PATH = Path('output')
+
+    def setUp(self):
+        self.generator = GeneratorMock()
+
+    @mock.patch('kaleidoscope.gallery.Photo')
+    def test_generate_gallery(self, mock_photo):
+        """Gallery should properly generate index files, copy assets and resize images."""
+        with TestingGallery() as gallery_path:
+            gal = gallery.Gallery(gallery_path, self.OUTPUT_PATH, self.generator)
+            gal.generate()
+            self.assert_gallery_generated(gal, mock_photo)
+
+    def assert_gallery_generated(self, gal, mock_photo):
+        self.generator.assert_render_called_with(
+            'gallery.html', self.OUTPUT_PATH / 'index.html', {'gallery': gal})
+        self.generator.assert_render_called_with(
+            'album.html', self.OUTPUT_PATH / TestingGallery.ALBUM_NAME / 'index.html',
+            {'gallery': gal, 'album': gal.albums[0]})
+        self.generator.assert_copy_assets_called_once_with(self.OUTPUT_PATH)
+        self.assertEqual(mock_photo.return_value.resize.call_count, 4)
+
+
 class TestAlbum(TestCase):
     maxDiff = None
 
@@ -97,3 +121,29 @@ class TestingGallery:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.tempdir.cleanup()
+
+
+class GeneratorMock(Generator):
+    def __init__(self):
+        self.render_calls = []
+        self.copy_assets_calls = []
+
+    def render(self, template_name: str, file_path: Path, context: dict) -> None:
+        self.render_calls.append((template_name, file_path, context))
+
+    def copy_assets(self, output_path: Path) -> None:
+        self.copy_assets_calls.append(output_path)
+
+    def assert_render_called_with(self, *args) -> None:
+        if args not in self.render_calls:
+            msg = "Expected Generator.render to be called with %s." % (args,)
+            raise AssertionError(msg)
+
+    def assert_copy_assets_called_once_with(self, output_path: Path) -> None:
+        if len(self.copy_assets_calls) != 1:
+            msg = "Expected Generator.copy_assets to be called once."
+            raise AssertionError(msg)
+        if self.copy_assets_calls[0] != output_path:
+            msg = "Expected Generator.copy_assets to be called with %s. Was called with %s" % (
+                output_path, self.copy_assets_calls[0])
+            raise AssertionError(msg)
