@@ -1,10 +1,13 @@
+import os
 from pathlib import Path
 
 import click
 import locale
 
-from kaleidoscope.gallery import Gallery, generate_gallery_ini, generate_album_ini
-from kaleidoscope.generator import Generator
+from kaleidoscope.reader import read_gallery
+from kaleidoscope.gallery import generate_gallery_ini, generate_album_ini
+from kaleidoscope.generator import generate
+
 
 gallery_path = "."
 
@@ -22,9 +25,8 @@ def cli(ctx, gallery):
 @cli.command()
 def build():
     """Build gallery."""
-    gallery = Gallery(Path(gallery_path), Path(gallery_path, "output"),
-                      Generator())
-    gallery.generate()
+    gallery = read_gallery(gallery_path)
+    generate(gallery, os.path.join(gallery_path, "output"))
 
 
 @cli.command(name='init-gallery')
@@ -38,4 +40,4 @@ def init_gallery():
                 type=click.Path(exists=True, file_okay=False, dir_okay=True))
 def init_album(directory):
     """Generate album configuration file with list of photos."""
-    generate_album_ini(Path(gallery_path).joinpath(directory), Generator())
+    generate_album_ini(Path(gallery_path).joinpath(directory))

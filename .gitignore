@@ -1,6 +1,6 @@
+.cache
 __pycache__
 .idea
-.mypy_cache
 .vscode
 *.egg-info
 node_modules

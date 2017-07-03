@@ -11,12 +11,12 @@
 
 {% block content %}
     <div class="gallery">
-    {% for year, albums in gallery.years %}
+    {% for year, albums in gallery.albums_by_year %}
         <div class="year gallery__row">
             <h2 class="year__title">{{ year }}</h2>
             {% for album in albums %}
                 <div class="album-link">
-                    <a href="{{ album.path.name }}" class="album-link__title">{{ album.title }}</a>
+                    <a href="{{ album.name }}" class="album-link__title">{{ album.title }}</a>
                     <span class="album-link__date">{{ album.date | formatdate }}</span>
                 </div>
             {% endfor %}
