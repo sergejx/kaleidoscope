@@ -27,15 +27,11 @@ def read_album(path):
     config = GalleryConfigParser()
     config.read(os.path.join(path, ALBUM_CONFIG))
     title, date = _read_album_info(path, config)
-    photos = []
 
-    photos_section = config['photos']
-    for filename, caption in photos_section.items():
+    photos = []
+    for filename, caption in config['photos'].items():
+        long_caption, short_caption = parse_caption(caption)
         source_path = os.path.join(path, filename)
-        if caption is None:
-            caption = ""
-        short_caption, _, tail = caption.partition("|")
-        long_caption = short_caption + tail
         photo = Photo(filename, short_caption, long_caption, source_path)
         photos.append(photo)
 
@@ -53,6 +49,14 @@ def _read_album_info(path, config):
         mtime = os.stat(path).st_mtime
         date = datetime.date.fromtimestamp(mtime)
     return title, date
+
+
+def parse_caption(caption):
+    if caption is None:
+        caption = ""
+    short_caption, _, tail = caption.partition("|")
+    long_caption = short_caption + tail
+    return long_caption, short_caption
 
 
 def parse_date(date_string):
