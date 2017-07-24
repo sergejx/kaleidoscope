@@ -14,6 +14,13 @@ def test_read_gallery(testing_gallery):
     assert len(gallery.albums) == 2
 
 
+def test_skipping_nonalbum_dirs(testing_gallery):
+    """Directories without album.ini should be skipped"""
+    testing_gallery.mkdir('not-album')
+    gallery = reader.read_gallery(str(testing_gallery))
+    assert len(gallery.albums) == 2
+
+
 def test_read_album(testing_gallery):
     album_dir = str(testing_gallery.join("testing-album"))
     album = reader.read_album(album_dir)
