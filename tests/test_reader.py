@@ -1,6 +1,6 @@
 import os
 import shutil
-from datetime import datetime
+from datetime import date
 import pytest
 
 from kaleidoscope import reader
@@ -11,7 +11,7 @@ def test_read_gallery(testing_gallery):
     gallery = reader.read_gallery(str(testing_gallery))
     assert gallery.title == "Hello World"
     assert gallery.author == "Me"
-    assert len(gallery.albums) == 1
+    assert len(gallery.albums) == 2
 
 
 def test_read_album(testing_gallery):
@@ -19,7 +19,18 @@ def test_read_album(testing_gallery):
     album = reader.read_album(album_dir)
     assert album.name == "testing-album"
     assert album.title == "Testing Album"
-    assert album.date == datetime(2017, 5, 15, 0, 0)
+    assert album.date == date(2017, 5, 15)
+
+
+def test_read_incomplete_album_info(testing_gallery):
+    """If album name and date are not specified, reader should derive them
+    from directory properties.
+    """
+    album_dir = str(testing_gallery.join("incomplete-album"))
+    album = reader.read_album(album_dir)
+    assert album.name == "incomplete-album"
+    assert album.title == "incomplete-album"
+    assert album.date == date.today()
 
 
 def test_read_photos(testing_gallery):
@@ -47,6 +58,13 @@ def testing_gallery(tmpdir):
     album_path = tmpdir.join('testing-album')
     album_path.mkdir()
     shutil.copy(os.path.join(data_path, 'album.ini'), str(album_path))
+    for photo in photos:
+        shutil.copy(os.path.join(data_path, 'photo.jpg'),
+                    str(album_path.join(photo)))
+    album_path = tmpdir.join('incomplete-album')
+    album_path.mkdir()
+    shutil.copy(os.path.join(data_path, 'album-incomplete.ini'),
+                str(album_path.join('album.ini')))
     for photo in photos:
         shutil.copy(os.path.join(data_path, 'photo.jpg'),
                     str(album_path.join(photo)))

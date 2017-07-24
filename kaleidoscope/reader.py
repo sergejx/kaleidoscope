@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 import os
 
 from kaleidoscope.config import GalleryConfigParser
@@ -26,8 +26,7 @@ def read_album(path):
     name = os.path.basename(path)
     config = GalleryConfigParser()
     config.read(os.path.join(path, ALBUM_CONFIG))
-    title = config.get('album', 'title')
-    date = datetime.strptime(config['album']['date'], '%Y-%m-%d')
+    title, date = _read_album_info(path, config)
     photos = []
 
     photos_section = config['photos']
@@ -41,6 +40,23 @@ def read_album(path):
         photos.append(photo)
 
     return Album(name, title, date, photos)
+
+
+def _read_album_info(path, config):
+    try:
+        title = config['album']['title']
+    except KeyError:
+        title = os.path.basename(path)
+    try:
+        date = parse_date(config['album']['date'])
+    except KeyError:
+        mtime = os.stat(path).st_mtime
+        date = datetime.date.fromtimestamp(mtime)
+    return title, date
+
+
+def parse_date(date_string):
+    return datetime.datetime.strptime(date_string, '%Y-%m-%d').date()
 
 
 def is_album(path):
