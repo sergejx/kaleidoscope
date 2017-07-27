@@ -10,6 +10,8 @@ setup(
         'Jinja2',
         'imagesize',
     ],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     entry_points='''
         [console_scripts]
         kaleidoscope=kaleidoscope.cli:cli
