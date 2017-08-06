@@ -5,20 +5,19 @@ from unittest.mock import MagicMock, call
 import pytest
 import imagesize
 
-from kaleidoscope import renderer
+from kaleidoscope import renderer, generator
 from kaleidoscope.model import Album, Gallery, Photo
 from kaleidoscope.generator import generate, DefaultListener
-import kaleidoscope.generator
 
 
-def test_generate_gallery_index(tmpdir):
+def test_generate_gallery_index(tmpdir, disable_resize):
     """Generator should generate gallery index file."""
     gallery = Gallery("Testing Gallery", "The Tester", [])
     generate(gallery, str(tmpdir))
     assert tmpdir.join("index.html").check()
 
 
-def test_gallery_index_context(tmpdir, monkeypatch):
+def test_gallery_index_context(tmpdir, monkeypatch, disable_resize):
     """Generator should provide the gallery object for index template."""
     render_mock = MagicMock()
     monkeypatch.setattr(renderer, 'render', render_mock)
@@ -33,13 +32,13 @@ def test_gallery_index_context(tmpdir, monkeypatch):
     )
 
 
-def test_album_index_generated(tmpdir, gallery_with_one_photo):
+def test_album_index_generated(tmpdir, gallery_with_one_photo, disable_resize):
     """Generator should create album index file."""
     generate(gallery_with_one_photo, str(tmpdir))
     assert tmpdir.join("album", "index.html").exists()
 
 
-def test_album_index_context(tmpdir, monkeypatch):
+def test_album_index_context(tmpdir, monkeypatch, disable_resize):
     """
     Generator should provide provide correct context to the album template.
     """
@@ -97,7 +96,7 @@ def test_resized_images_metadata(tmpdir, gallery_with_one_photo):
     assert photo.large.size <= (1500, 1000)
 
 
-def test_copy_assets(tmpdir):
+def test_copy_assets(tmpdir, disable_resize):
     """Generator should copy assets directory into output."""
     gallery = Gallery("", "", [])
     generate(gallery, str(tmpdir))
@@ -106,7 +105,7 @@ def test_copy_assets(tmpdir):
     assert tmpdir.join("assets", "vendor").exists()
 
 
-def test_assets_directory_cleaned(tmpdir):
+def test_assets_directory_cleaned(tmpdir, disable_resize):
     """Generator should clean up existing assets directory."""
     extra_file = tmpdir.join("assets", "existing-file.txt")
     extra_file.ensure()
@@ -114,7 +113,8 @@ def test_assets_directory_cleaned(tmpdir):
     assert not extra_file.exists()
 
 
-def test_generator_reporting_events(gallery_with_three_photos, tmpdir):
+def test_generator_reporting_events(gallery_with_three_photos, tmpdir,
+                                    disable_resize):
     """Generator should report important events using provided reporter."""
     listener = MagicMock(spec=DefaultListener)
     generate(gallery_with_three_photos, tmpdir, listener)
@@ -139,3 +139,10 @@ def gallery_with_three_photos():
     photos = [Photo("f%d.jpg" % (i,), "", "", photo_path) for i in range(3)]
     album = Album("album", "The Album", date(2017, 6, 24), photos)
     return Gallery("Testing Gallery", "The Tester", [album])
+
+
+@pytest.fixture
+def disable_resize(monkeypatch):
+    """Replace image resize with dummy function and provide constant size."""
+    monkeypatch.setattr(generator, 'resize', MagicMock())
+    monkeypatch.setattr(imagesize, 'get', MagicMock(return_value=(42, 42)))
