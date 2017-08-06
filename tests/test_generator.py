@@ -125,6 +125,21 @@ def test_generator_reporting_events(gallery_with_three_photos, tmpdir,
     assert listener.resizing_photo.call_count == 3
 
 
+def test_counting_photos_to_resize(
+        gallery_with_three_photos, tmpdir, disable_resize):
+    """Listener should receive count of photos that would be really resized."""
+    # Let's make 1.jpg already resized => 2 photos would remain
+    tmpdir.join("album", "large", "f1.jpg").ensure()
+    tmpdir.join("album", "thumb", "f1.jpg").ensure()
+
+    listener = MagicMock(spec=DefaultListener)
+    generate(gallery_with_three_photos, tmpdir, listener)
+
+    album = gallery_with_three_photos.albums[0]
+    assert listener.starting_album.call_args == call(album, 2)
+    assert listener.resizing_photo.call_count == 2
+
+
 @pytest.fixture
 def gallery_with_one_photo():
     photo_path = os.path.join(os.path.dirname(__file__), 'data', 'photo.jpg')

@@ -51,7 +51,9 @@ class ProgressReporter(DefaultListener):
 
     def starting_album(self, album, photos_to_process):
         print("Generating album " + album.title)
-        self._progressbar = tqdm(unit="photo", total=photos_to_process)
+        if photos_to_process > 0:
+            self._progressbar = tqdm(desc="Resizing", unit="photo",
+                                     total=photos_to_process)
 
     def resizing_photo(self, photo):
         self._progressbar.update(1)

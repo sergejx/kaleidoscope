@@ -31,12 +31,18 @@ def generate(gallery, output, listener=DefaultListener()):
     copy_assets(output)
     generate_gallery_index(gallery, output)
     for album in gallery.albums:
-        listener.starting_album(album, len(album.photos))
-        for photo in album.photos:
+        album_output = os.path.join(output, album.name)
+        to_resize = [p for p in album.photos if needs_resize(p, album_output)]
+
+        listener.starting_album(album, len(to_resize))
+        for photo in to_resize:
             listener.resizing_photo(photo)
-            photo.thumb = make_resized(album.name, photo, 'thumb', output)
-            photo.large = make_resized(album.name, photo, 'large', output)
-        generate_album_index(gallery, album, output)
+            resize(photo, 'thumb', album_output)
+            resize(photo, 'large', album_output)
+        for photo in album.photos:
+            photo.thumb = read_resized_metadata(photo, 'thumb', album_output)
+            photo.large = read_resized_metadata(photo, 'large', album_output)
+        generate_album_index(gallery, album, album_output)
         listener.finishing_album()
 
 
@@ -46,28 +52,40 @@ def generate_gallery_index(gallery, output):
     renderer.render('gallery.html', path, context)
 
 
-def generate_album_index(gallery, album, output):
+def generate_album_index(gallery, album, album_output):
     context = {
         'album': album,
         'gallery': gallery,
         'current_year': date.today().year,
     }
-    index_path = os.path.join(output, album.name, "index.html")
+    index_path = os.path.join(album_output, "index.html")
     renderer.render('album.html', index_path, context)
 
 
-def make_resized(album_name, photo, size_name, output):
-    target = os.path.join(output, album_name, size_name, photo.name)
+def resized_image_path(album_output, size_name, photo):
+    return os.path.join(album_output, size_name, photo.name)
+
+
+def needs_resize(photo, album_output):
+    thumb_path = resized_image_path(album_output, 'thumb', photo)
+    large_path = resized_image_path(album_output, 'large', photo)
+    return not os.path.exists(thumb_path) or not os.path.exists(large_path)
+
+
+def read_resized_metadata(photo, size_name, album_output):
+    url = "{}/{}".format(size_name, photo.name)
+    size = imagesize.get(resized_image_path(album_output, size_name, photo))
+    return model.ResizedImage(url, size)
+
+
+def resize(photo, size, album_output):
+    target = resized_image_path(album_output, size, photo)
+    geometry = SIZES[size]
     if not os.path.exists(target):
-        resize(photo.source_path, target, SIZES[size_name])
-    image_url = "{}/{}".format(size_name, photo.name)
-    return model.ResizedImage(image_url, imagesize.get(target))
-
-
-def resize(source, target, geometry):
-    os.makedirs(os.path.dirname(target), exist_ok=True)
-    subprocess.run(['convert', source, '-auto-orient',
-                    '-resize', "{}x{}>".format(*geometry), target])
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        subprocess.run(['convert', photo.source_path,
+                        '-auto-orient', '-resize', "{}x{}>".format(*geometry),
+                        target])
 
 
 def copy_assets(output):
