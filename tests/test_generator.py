@@ -90,9 +90,9 @@ def test_resized_images_metadata(tmpdir, gallery_with_one_photo):
     """Generator should fill resized images metadata in the Photo."""
     generate(gallery_with_one_photo, str(tmpdir))
     photo = gallery_with_one_photo.albums[0].photos[0]
-    assert photo.thumb.url == ("thumb/photo.jpg")
+    assert photo.thumb.url == "thumb/photo.jpg"
     assert photo.thumb.size <= (300, 200)
-    assert photo.large.url == ("large/photo.jpg")
+    assert photo.large.url == "large/photo.jpg"
     assert photo.large.size <= (1500, 1000)
 
 
