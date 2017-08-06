@@ -53,4 +53,6 @@ class ProgressReporter(DefaultListener):
         self._progressbar.update(1)
 
     def finishing_album(self):
-        self._progressbar.close()
+        if self._progressbar:
+            self._progressbar.close()
+            self._progressbar = None
