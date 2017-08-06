@@ -1,47 +1,41 @@
+import argparse
+import locale
 import os
 from pathlib import Path
 
-import click
-import locale
 from tqdm import tqdm
 
-from kaleidoscope.reader import read_gallery
 from kaleidoscope.gallery import generate_gallery_ini, generate_album_ini
 from kaleidoscope.generator import generate, DefaultListener
+from kaleidoscope.reader import read_gallery
 
-gallery_path = "."
 
-
-@click.group()
-@click.option('--gallery', type=click.Path())
-@click.pass_context
-def cli(ctx, gallery):
+def main():
     locale.setlocale(locale.LC_ALL, '')
-    if gallery is not None:
-        global gallery_path
-        gallery_path = gallery
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--gallery",
+        metavar="DIR",
+        help="path to the gallery",
+        default=".")
+    parser.add_argument(
+        "--init",
+        action='store_true',
+        help="generate gallery configuration file")
+    parser.add_argument(
+        "--init-album",
+        metavar="DIR",
+        help="generate album configuration file with list of photos")
+    args = parser.parse_args()
 
-
-@cli.command()
-def build():
-    """Build gallery."""
-    gallery = read_gallery(gallery_path)
-    output_path = os.path.join(gallery_path, "output")
-    generate(gallery, output_path, ProgressReporter())
-
-
-@cli.command(name='init-gallery')
-def init_gallery():
-    """Generate gallery configuration file."""
-    generate_gallery_ini(Path(gallery_path))
-
-
-@cli.command(name='init-album')
-@click.argument('directory',
-                type=click.Path(exists=True, file_okay=False, dir_okay=True))
-def init_album(directory):
-    """Generate album configuration file with list of photos."""
-    generate_album_ini(Path(gallery_path).joinpath(directory))
+    if args.init:
+        generate_gallery_ini(Path(args.gallery))
+    elif args.init_album:
+        generate_album_ini(Path(args.gallery).joinpath(args.init_album))
+    else:
+        gallery = read_gallery(args.gallery)
+        output_path = os.path.join(args.gallery, "output")
+        generate(gallery, output_path, ProgressReporter())
 
 
 class ProgressReporter(DefaultListener):
