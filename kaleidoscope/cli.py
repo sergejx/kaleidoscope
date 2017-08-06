@@ -3,11 +3,11 @@ from pathlib import Path
 
 import click
 import locale
+from tqdm import tqdm
 
 from kaleidoscope.reader import read_gallery
 from kaleidoscope.gallery import generate_gallery_ini, generate_album_ini
-from kaleidoscope.generator import generate
-
+from kaleidoscope.generator import generate, DefaultListener
 
 gallery_path = "."
 
@@ -26,7 +26,8 @@ def cli(ctx, gallery):
 def build():
     """Build gallery."""
     gallery = read_gallery(gallery_path)
-    generate(gallery, os.path.join(gallery_path, "output"))
+    output_path = os.path.join(gallery_path, "output")
+    generate(gallery, output_path, ProgressReporter())
 
 
 @cli.command(name='init-gallery')
@@ -41,3 +42,19 @@ def init_gallery():
 def init_album(directory):
     """Generate album configuration file with list of photos."""
     generate_album_ini(Path(gallery_path).joinpath(directory))
+
+
+class ProgressReporter(DefaultListener):
+    """Reports progress of gallery generation to a user."""
+    def __init__(self):
+        self._progressbar = None
+
+    def starting_album(self, album, photos_to_process):
+        print("Generating album " + album.title)
+        self._progressbar = tqdm(unit="photo", total=photos_to_process)
+
+    def resizing_photo(self, photo):
+        self._progressbar.update(1)
+
+    def finishing_album(self):
+        self._progressbar.close()

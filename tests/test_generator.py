@@ -1,13 +1,14 @@
 import os
 from datetime import date
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 import imagesize
 
 from kaleidoscope import renderer
 from kaleidoscope.model import Album, Gallery, Photo
-from kaleidoscope.generator import generate
+from kaleidoscope.generator import generate, DefaultListener
+import kaleidoscope.generator
 
 
 def test_generate_gallery_index(tmpdir):
@@ -113,9 +114,28 @@ def test_assets_directory_cleaned(tmpdir):
     assert not extra_file.exists()
 
 
+def test_generator_reporting_events(gallery_with_three_photos, tmpdir):
+    """Generator should report important events using provided reporter."""
+    listener = MagicMock(spec=DefaultListener)
+    generate(gallery_with_three_photos, tmpdir, listener)
+
+    album = gallery_with_three_photos.albums[0]
+    assert listener.starting_album.call_args == call(album, 3)
+    assert listener.finishing_album.called
+    assert listener.resizing_photo.call_count == 3
+
+
 @pytest.fixture
 def gallery_with_one_photo():
     photo_path = os.path.join(os.path.dirname(__file__), 'data', 'photo.jpg')
     photo = Photo("photo.jpg", "", "", photo_path)
     album = Album("album", "The Album", date(2017, 6, 24), [photo])
     return Gallery("Testin Gallery", "The Tester", [album])
+
+
+@pytest.fixture
+def gallery_with_three_photos():
+    photo_path = os.path.join(os.path.dirname(__file__), 'data', 'photo.jpg')
+    photos = [Photo("f%d.jpg" % (i,), "", "", photo_path) for i in range(3)]
+    album = Album("album", "The Album", date(2017, 6, 24), photos)
+    return Gallery("Testing Gallery", "The Tester", [album])

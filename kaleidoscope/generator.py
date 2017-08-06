@@ -11,15 +11,33 @@ from kaleidoscope import model, renderer
 SIZES = {'thumb': (300, 200), 'large': (1500, 1000)}
 
 
-def generate(gallery, output):
-    """Generate the whole gallery."""
+class DefaultListener:
+    """Default listener for generator events. Does nothing."""
+    def starting_album(self, album, photos_to_process):
+        pass
+
+    def finishing_album(self):
+        pass
+
+    def resizing_photo(self, photo):
+        pass
+
+
+def generate(gallery, output, listener=DefaultListener()):
+    """Generate the whole gallery.
+
+    Events are reported to provided listener (see DefaultListener).
+    """
     copy_assets(output)
     generate_gallery_index(gallery, output)
     for album in gallery.albums:
+        listener.starting_album(album, len(album.photos))
         for photo in album.photos:
+            listener.resizing_photo(photo)
             photo.thumb = make_resized(album.name, photo, 'thumb', output)
             photo.large = make_resized(album.name, photo, 'large', output)
         generate_album_index(gallery, album, output)
+        listener.finishing_album()
 
 
 def generate_gallery_index(gallery, output):

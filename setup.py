@@ -9,6 +9,7 @@ setup(
         'Click',
         'Jinja2',
         'imagesize',
+        'tqdm',
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
