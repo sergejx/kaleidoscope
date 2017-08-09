@@ -39,10 +39,12 @@ function initPhotoSwipe() {
 
 $(function() {
     $('.album').justifiedGallery({
-        rowHeight: 120,
-        maxRowHeight: 300,
+        rowHeight: 150,
+        maxRowHeight: 200,
         margins: 10,
+        border: 15,
         waitThumbnailsLoad: false,
-        rel: 'album'
-    }).on('jg.complete', initPhotoSwipe);
+        refreshTime: 500
+    })
+    initPhotoSwipe()
 });
