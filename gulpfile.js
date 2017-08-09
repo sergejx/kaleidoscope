@@ -6,10 +6,10 @@ var dest = 'kaleidoscope/assets/vendor/'
 /* Copy JS from libraries */
 gulp.task('js', function () {
     gulp.src([
-        'node_modules/jquery/dist/jquery.min.js',
-        'node_modules/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
-        'node_modules/photoswipe/dist/photoswipe.min.js',
-        'node_modules/photoswipe/dist/photoswipe-ui-default.min.js'])
+        'bower_components/jquery/dist/jquery.min.js',
+        'bower_components/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+        'bower_components/photoswipe/dist/photoswipe.min.js',
+        'bower_components/photoswipe/dist/photoswipe-ui-default.min.js'])
         .pipe(concat('scripts.js'))
         .pipe(gulp.dest(dest));
 });
@@ -17,9 +17,9 @@ gulp.task('js', function () {
 /* Copy CSS from libraries */
 gulp.task('css', function () {
     gulp.src([
-        'node_modules/justifiedGallery/dist/css/justifiedGallery.min.css',
-        'node_modules/photoswipe/dist/photoswipe.css',
-        'node_modules/photoswipe/dist/default-skin/default-skin.css'])
+        'bower_components/justifiedGallery/dist/css/justifiedGallery.min.css',
+        'bower_components/photoswipe/dist/photoswipe.css',
+        'bower_components/photoswipe/dist/default-skin/default-skin.css'])
         .pipe(concat('style.css'))
         .pipe(gulp.dest(dest));
 });
@@ -27,9 +27,9 @@ gulp.task('css', function () {
 /* Copy images from libraries */
 gulp.task('images', function () {
     gulp.src([
-        'node_modules/photoswipe/dist/default-skin/default-skin.png',
-        'node_modules/photoswipe/dist/default-skin/default-skin.svg',
-        'node_modules/photoswipe/dist/default-skin/preloader.gif'])
+        'bower_components/photoswipe/dist/default-skin/default-skin.png',
+        'bower_components/photoswipe/dist/default-skin/default-skin.svg',
+        'bower_components/photoswipe/dist/default-skin/preloader.gif'])
         .pipe(gulp.dest(dest));
 });
 

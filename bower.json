@@ -1,0 +1,9 @@
+{
+  "name": "kaleidoscope",
+  "private": true,
+  "dependencies": {
+    "jquery": "3.2.1",
+    "justifiedGallery": "3.6.1",
+    "photoswipe": "4.1.2"
+  }
+}
