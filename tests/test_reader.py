@@ -1,7 +1,5 @@
 import os
-import shutil
 from datetime import date
-import pytest
 
 from kaleidoscope import reader
 
@@ -55,24 +53,3 @@ def test_read_photos(testing_gallery):
         assert photo.short_caption == short_caption
         assert photo.long_caption == long_caption
         assert photo.source_path == os.path.join(album_dir, name)
-
-
-@pytest.fixture
-def testing_gallery(tmpdir):
-    data_path = os.path.join(os.path.dirname(__file__), 'data')
-    photos = ['Photo1.jpg', 'Photo2.jpg', 'Photo3.jpg', 'Photo4.jpg']
-    shutil.copy(os.path.join(data_path, 'gallery.ini'), str(tmpdir))
-    album_path = tmpdir.join('testing-album')
-    album_path.mkdir()
-    shutil.copy(os.path.join(data_path, 'album.ini'), str(album_path))
-    for photo in photos:
-        shutil.copy(os.path.join(data_path, 'photo.jpg'),
-                    str(album_path.join(photo)))
-    album_path = tmpdir.join('incomplete-album')
-    album_path.mkdir()
-    shutil.copy(os.path.join(data_path, 'album-incomplete.ini'),
-                str(album_path.join('album.ini')))
-    for photo in photos:
-        shutil.copy(os.path.join(data_path, 'photo.jpg'),
-                    str(album_path.join(photo)))
-    return tmpdir
