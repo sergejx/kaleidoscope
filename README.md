@@ -8,16 +8,16 @@ A static photo gallery generator.
 
 1. Create an empty directory for your gallery and generate configuration file:
 
-        kaleidoscope init-gallery
+        kaleidoscope --init
 
 2. Create a sub-directory for the first album and copy your photos into it.
 Generate album configuration file:
 
-        kaleidoscope init-album <dir-name>
+        kaleidoscope --init-album DIR
 
 3. Build the gallery with 
 
-        kaleidoscope build
+        kaleidoscope
 
 
 ## Directory structure and file formats ##
