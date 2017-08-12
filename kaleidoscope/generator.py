@@ -8,7 +8,7 @@ import imagesize
 from kaleidoscope import model, renderer
 
 
-SIZES = {'thumb': (300, 200), 'large': (1500, 1000)}
+SIZES = {'thumb': (330, 220), 'large': (1500, 1000)}
 
 
 class DefaultListener:
