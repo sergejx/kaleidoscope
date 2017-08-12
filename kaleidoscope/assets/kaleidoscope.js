@@ -40,7 +40,6 @@ function initPhotoSwipe() {
 $(function() {
     $('.album').justifiedGallery({
         rowHeight: 150,
-        maxRowHeight: 200,
         margins: 10,
         border: 15,
         waitThumbnailsLoad: false,
