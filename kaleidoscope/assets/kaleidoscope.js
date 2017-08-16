@@ -7,7 +7,7 @@ function collectItems($thumbnails) {
         var item = {
             src: $(this).attr('href'),
             msrc: $img.attr('src'),
-            title: $img.attr('title'),
+            title: $img.data('description'),
             w: $img.data('fullWidth'),
             h: $img.data('fullHeight')
         };

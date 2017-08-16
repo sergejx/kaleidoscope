@@ -20,7 +20,7 @@
             <a href="{{ photo.large.url }}" class="thumbnail">
                 <img rel="album"
                      src="{{ photo.thumb.url }}"
-                     alt="{{ photo.caption }}" title="{{ photo.title }}"
+                     alt="{{ photo.short_caption }}" data-description="{{ photo.long_caption }}"
                      width="{{ photo.thumb.size[0] }}" height="{{ photo.thumb.size[1] }}"
                      data-full-width="{{ photo.large.size[0] }}" data-full-height="{{ photo.large.size[1] }}">
             </a>
