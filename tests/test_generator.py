@@ -102,7 +102,6 @@ def test_copy_assets(tmpdir, disable_resize):
     generate(gallery, str(tmpdir))
     assert tmpdir.join("assets", "kaleidoscope.js").exists()
     assert tmpdir.join("assets", "kaleidoscope.css").exists()
-    assert tmpdir.join("assets", "vendor").exists()
 
 
 def test_assets_directory_cleaned(tmpdir, disable_resize):

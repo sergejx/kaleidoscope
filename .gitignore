@@ -4,5 +4,6 @@ __pycache__
 .vscode
 *.egg-info
 bower_components
+kaleidoscope/assets
 node_modules
 venv

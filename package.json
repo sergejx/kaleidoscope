@@ -1,8 +1,16 @@
 {
   "name": "kaleidoscope",
   "private": true,
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "photoswipe": "4.1.2"
+  },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1"
+    "brunch": "^2.4.0",
+    "copyfilemon-brunch": "^3.3.0",
+    "uglify-js-brunch": "^2.10.0"
+  },
+  "scripts": {
+    "brunch": "brunch"
   }
 }
