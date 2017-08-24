@@ -2,7 +2,8 @@
   "name": "kaleidoscope",
   "private": true,
   "dependencies": {
-    "jquery": "^3.2.1",
+    "jquery": "3.2.1",
+    "justified-layout": "2.0.0",
     "photoswipe": "4.1.2"
   },
   "devDependencies": {

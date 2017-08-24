@@ -53,15 +53,42 @@ body {
     }
 
 .thumbnail {
+    position: absolute;
+    display: inline-block;
     box-sizing: border-box;
+    overflow: hidden;
+    opacity: 0;
     }
     .thumbnail:hover {
         border: 2px solid #ffb02f;
     }
 
-img {
-   border: 0;
-}
+    .thumbnail:hover img{
+        top: -2px;
+        left: -2px;
+    }
+    .thumbnail__caption {
+        box-sizing: border-box;
+        position:absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 3px 5px;
+        color: #eeeeec;
+        background-color: #000000;
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+    }
+    .thumbnail:hover .thumbnail__caption {
+        opacity: 0.70;
+    }
+    .thumbnail img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: 0;
+        background-color: #232729;
+    }
 
 a:link {
    color: #ffb02f;

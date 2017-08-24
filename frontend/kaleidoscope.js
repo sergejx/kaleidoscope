@@ -1,52 +1,94 @@
-'use strict';
+'use strict'
 
-var PhotoSwipe = require('photoswipe/dist/photoswipe')
-var PhotoSwipeUI_Default = require('photoswipe/dist/photoswipe-ui-default')
+var justifiedLayout = require('justified-layout')
+var photoswipe = require('frontend/photoswipe')
 
-function collectItems($thumbnails) {
-    var items = [];
-    $thumbnails.each(function() {
-        var $img = $(this).children('img').first();
+var layoutConfig = {
+    boxSpacing: 10,
+    containerPadding: 15,
+    targetRowHeight: 150,
+    targetRowHeightTolerance: 0.25
+}
+
+var thumbnails = []
+var imagesInfo = []
+
+
+function init() {
+    thumbnails = document.querySelectorAll('.thumbnail')
+    imagesInfo = collectInfo()
+    createCaptions()
+    doLayout()
+    window.addEventListener('resize', doLayout)
+    photoswipe.init(imagesInfo)
+}
+
+function collectInfo() {
+    var info = []
+    for (var i = 0; i < thumbnails.length; i++) {
+        var img = thumbnails[i].firstElementChild
         var item = {
-            src: $(this).attr('href'),
-            msrc: $img.attr('src'),
-            title: $img.data('description'),
-            w: $img.data('fullWidth'),
-            h: $img.data('fullHeight')
-        };
-        items.push(item);
-    });
-    return items;
+            src: thumbnails[i].getAttribute('href'),
+            msrc: img.getAttribute('src'),
+            title: img.dataset.description,
+            w: img.dataset.fullWidth,
+            h: img.dataset.fullHeight,
+            width: img.getAttribute('width'),
+            height: img.getAttribute('height')
+        }
+        info.push(item)
+    }
+    return info
 }
 
-function initPhotoSwipe() {
-    var pswp = document.querySelector('.pswp')
-    var $thumbnails = $('.thumbnail');
-    var items = collectItems($thumbnails);
-
-    $thumbnails.on('click', function(event) {
-        event.preventDefault();
-        var index = $(this).index();
-        var options = {
-            index: index,
-            bgOpacity: 0.85,
-            getThumbBoundsFn: function(index) {
-                var $thumbnail = $thumbnails.eq(index);
-                var offset = $thumbnail.offset();
-                return {x: offset.left, y: offset.top, w: $thumbnail.width()};
-            }
-        };
-        new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options).init();
-    });
+function createCaptions() {
+    for (var i = 0; i < thumbnails.length; i++) {
+        var image = thumbnails[i].firstElementChild
+        var text = image.getAttribute('alt')
+        if (text != '') {
+            image.insertAdjacentHTML('afterend',
+                '<div class="thumbnail__caption">' + text + '</div>')
+        }
+    }
 }
 
-$(function() {
-    $('.album').justifiedGallery({
-        rowHeight: 150,
-        margins: 10,
-        border: 15,
-        waitThumbnailsLoad: false,
-        refreshTime: 1000
-    })
-    initPhotoSwipe()
-});
+function computeLayout(container) {
+    layoutConfig.containerWidth = container.offsetWidth
+    var geometry = justifiedLayout(imagesInfo, layoutConfig)
+    console.log(container.offsetWidth, geometry)
+    container.style.height = inPx(geometry.containerHeight)
+    return geometry
+}
+
+function setSize(element, box) {
+    element.style.width = inPx(box.width)
+    element.style.height = inPx(box.height)
+}
+
+function setPosition(element, box, container) {
+    element.style.top = inPx(container.offsetTop + box.top)
+    element.style.left = inPx(container.offsetLeft + box.left)
+}
+
+function doLayout() {
+    var container = document.querySelector('.album')
+    var geometry = computeLayout(container)
+    if (layoutConfig.containerWidth !== container.offsetWidth) {
+        geometry = computeLayout(container)
+    }
+    for (var i = 0; i < geometry.boxes.length; i++) {
+        var anchor = thumbnails[i]
+        var image = thumbnails[i].firstElementChild
+        var box = geometry.boxes[i]
+        setPosition(anchor, box, container)
+        setSize(anchor, box)
+        setSize(image, box)
+        anchor.style.opacity = '1'
+    }
+}
+
+function inPx(number) {
+    return number.toString() + 'px'
+}
+
+document.addEventListener('DOMContentLoaded', init)
