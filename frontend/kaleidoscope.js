@@ -20,25 +20,17 @@ function init() {
     createCaptions()
     doLayout()
     window.addEventListener('resize', doLayout)
-    photoswipe.init(imagesInfo)
+    photoswipe.init(thumbnails)
 }
 
 function collectInfo() {
-    var info = []
-    for (var i = 0; i < thumbnails.length; i++) {
-        var img = thumbnails[i].firstElementChild
-        var item = {
-            src: thumbnails[i].getAttribute('href'),
-            msrc: img.getAttribute('src'),
-            title: img.dataset.description,
-            w: img.dataset.fullWidth,
-            h: img.dataset.fullHeight,
+    return Array.prototype.map.call(thumbnails, function(thumbnail) {
+        var img = thumbnail.firstElementChild
+        return {
             width: img.getAttribute('width'),
             height: img.getAttribute('height')
         }
-        info.push(item)
-    }
-    return info
+    })
 }
 
 function createCaptions() {
@@ -55,7 +47,6 @@ function createCaptions() {
 function computeLayout(container) {
     layoutConfig.containerWidth = container.offsetWidth
     var geometry = justifiedLayout(imagesInfo, layoutConfig)
-    console.log(container.offsetWidth, geometry)
     container.style.height = inPx(geometry.containerHeight)
     return geometry
 }
