@@ -11,7 +11,7 @@ function init(thumbnails) {
     var items = collectItems(thumbnails)
     var pswp = document.querySelector('.pswp')
     for (var i = 0; i < thumbnails.length; i++) {
-        bind(thumbnails[i], i, items, pswp)
+        bind(thumbnails, i, items, pswp)
     }
 }
 
@@ -28,17 +28,17 @@ function collectItems(thumbnails) {
     })
 }
 
-function bind(thumbnail, index, items, pswp) {
-    thumbnail.addEventListener('click', function (event) {
+function bind(thumbnails, i, items, pswp) {
+    thumbnails[i].addEventListener('click', function (event) {
         event.preventDefault()
         var options = {
-            index: index,
+            index: i,
             bgOpacity: 0.85,
             getThumbBoundsFn: function (index) {
                 return {
-                    x: thumbnail.offsetLeft,
-                    y: thumbnail.offsetTop,
-                    w: thumbnail.offsetWidth
+                    x: thumbnails[index].offsetLeft,
+                    y: thumbnails[index].offsetTop,
+                    w: thumbnails[index].offsetWidth
                 }
             }
         };
