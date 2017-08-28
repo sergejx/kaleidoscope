@@ -3,7 +3,6 @@ __pycache__
 .idea
 .vscode
 *.egg-info
-bower_components
 kaleidoscope/assets
 node_modules
 venv
