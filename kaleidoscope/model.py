@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+import datetime
+from dataclasses import dataclass
 from itertools import groupby
+from typing import Optional
 
 
 def group_albums_by_year(albums):
@@ -19,6 +24,7 @@ class Gallery:
         self.albums_by_year = group_albums_by_year(self.albums)
 
 
+@dataclass
 class Album:
     """
     Album information
@@ -27,13 +33,13 @@ class Album:
     - date -- datetime.date for ordering albums in time
     - photos -- ordered list of photos
     """
-    def __init__(self, name, title, date, photos):
-        self.name = name
-        self.title = title
-        self.date = date
-        self.photos = photos
+    name: str
+    title: str
+    date: datetime.date
+    photos: Photo
 
 
+@dataclass
 class Photo:
     """
     Photo information
@@ -42,17 +48,16 @@ class Photo:
     - long_caption
     - source_path -- path to the source photo
     """
-    def __init__(self, name, short_caption, long_caption, source_path):
-        self.name = name
-        self.short_caption = short_caption
-        self.long_caption = long_caption
-        self.source_path = source_path
-        self.large = None
-        self.thumb = None
+    name: str
+    short_caption: str
+    long_caption: str
+    source_path: str
+    large: Optional[ResizedImage] = None
+    thumb: Optional[ResizedImage] = None
 
 
+@dataclass
 class ResizedImage:
     """Resized image information: URL and size."""
-    def __init__(self, url, size):
-        self.url = url
-        self.size = size
+    url: str
+    size: str
