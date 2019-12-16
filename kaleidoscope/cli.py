@@ -3,7 +3,7 @@ import locale
 import os
 from pathlib import Path
 
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore
 
 from kaleidoscope.gallery import generate_gallery_ini, generate_album_ini
 from kaleidoscope.generator import generate, DefaultListener

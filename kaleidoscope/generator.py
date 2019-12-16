@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from datetime import date
 
-import imagesize
+import imagesize  # type: ignore
 
 from kaleidoscope import model, renderer
 
