@@ -1,8 +1,9 @@
-.cache
-__pycache__
-.idea
-.vscode
 *.egg-info
-kaleidoscope/assets
-node_modules
-venv
+.*cache/
+.eggs/
+.idea/
+.vscode/
+__pycache__/
+kaleidoscope/assets/
+node_modules/
+venv/
