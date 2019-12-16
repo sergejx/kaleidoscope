@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from itertools import groupby
-from typing import Optional
+from typing import Optional, List, Tuple
 
 
 def group_albums_by_year(albums):
@@ -36,7 +36,7 @@ class Album:
     name: str
     title: str
     date: datetime.date
-    photos: Photo
+    photos: List[Photo]
 
 
 @dataclass
@@ -60,4 +60,4 @@ class Photo:
 class ResizedImage:
     """Resized image information: URL and size."""
     url: str
-    size: str
+    size: Tuple[int, int]

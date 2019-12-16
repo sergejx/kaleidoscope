@@ -38,7 +38,7 @@ def test_create_album():
     When created, album should store provided metadata and an empty list of
     photos.
     """
-    photo = model.Photo("photo.jpg", "", "", None)
+    photo = model.Photo("photo.jpg", "", "", "")
     album = model.Album("folder", "Title", date(2017, 6, 10), [photo])
     assert album.name == "folder"
     assert album.title == "Title"
