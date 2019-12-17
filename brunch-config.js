@@ -21,6 +21,7 @@ module.exports = {
         }
     },
     plugins: {
+        babel: {},
         copyfilemon: {
             ".": [
                 'node_modules/photoswipe/dist/default-skin/default-skin.png',
@@ -29,4 +30,4 @@ module.exports = {
             ]
         }
     }
-}
+};

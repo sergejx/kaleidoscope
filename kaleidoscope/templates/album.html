@@ -13,17 +13,20 @@
 
 {% block content %}
     <div class="main">
-        <div class="album justified-gallery">
-        {% for photo in album.photos %}
-            <a href="{{ photo.large.url }}" class="thumbnail">
-                <img class="thumbnail__image" rel="album"
-                     src="{{ photo.thumb.url }}"
-                     alt="{{ photo.short_caption }}" data-description="{{ photo.long_caption }}"
-                     width="{{ photo.thumb.size[0] }}" height="{{ photo.thumb.size[1] }}"
-                     data-full-width="{{ photo.large.size[0] }}" data-full-height="{{ photo.large.size[1] }}">
-            </a>
+        {% for section in album.sections %}
+            <h2 class="section-title">{{ section.name }}</h2>
+            <div class="album">
+            {% for photo in section.photos %}
+                <a href="{{ photo.large.url }}" class="thumbnail">
+                    <img class="thumbnail__image" rel="album"
+                         src="{{ photo.thumb.url }}"
+                         alt="{{ photo.short_caption }}" data-description="{{ photo.long_caption }}"
+                         width="{{ photo.thumb.size[0] }}" height="{{ photo.thumb.size[1] }}"
+                         data-full-width="{{ photo.large.size[0] }}" data-full-height="{{ photo.large.size[1] }}">
+                </a>
+            {% endfor %}
+            </div>
         {% endfor %}
-        </div>
     </div>
     
     {% include "photoswipe.html" %}

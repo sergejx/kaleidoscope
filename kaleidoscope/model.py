@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from itertools import groupby
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Iterable
 
 
 def group_albums_by_year(albums):
@@ -36,6 +36,19 @@ class Album:
     name: str
     title: str
     date: datetime.date
+    sections: List[Section]
+
+    @property
+    def photos(self) -> Iterable[Photo]:
+        for section in self.sections:
+            for photo in section.photos:
+                yield photo
+
+
+@dataclass
+class Section:
+    """A named section in the album"""
+    name: str
     photos: List[Photo]
 
 

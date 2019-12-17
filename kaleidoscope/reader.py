@@ -2,7 +2,7 @@ import datetime
 import os
 
 from kaleidoscope.config import GalleryConfigParser
-from kaleidoscope.model import Gallery, Album, Photo
+from kaleidoscope.model import Gallery, Album, Section, Photo
 
 GALLERY_CONFIG = 'gallery.ini'
 ALBUM_CONFIG = 'album.ini'
@@ -22,20 +22,28 @@ def read_gallery(path):
     return Gallery(title, author, albums)
 
 
-def read_album(path):
+def read_album(path: str) -> Album:
     name = os.path.basename(path)
     config = GalleryConfigParser()
     config.read(os.path.join(path, ALBUM_CONFIG))
     title, date = _read_album_info(path, config)
 
+    sections = []
+    for section_name in config.sections():
+        if section_name != 'album':
+            sections.append(_read_sections(section_name, config, path))
+
+    return Album(name, title, date, sections)
+
+
+def _read_sections(name: str, config: GalleryConfigParser, path: str) -> Section:
     photos = []
-    for filename, caption in config['photos'].items():
+    for filename, caption in config[name].items():
         long_caption, short_caption = parse_caption(caption)
         source_path = os.path.join(path, filename)
         photo = Photo(filename, short_caption, long_caption, source_path)
         photos.append(photo)
-
-    return Album(name, title, date, photos)
+    return Section(name, photos)
 
 
 def _read_album_info(path, config):

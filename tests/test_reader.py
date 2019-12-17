@@ -25,6 +25,8 @@ def test_read_album(testing_gallery):
     assert album.name == "testing-album"
     assert album.title == "Testing Album"
     assert album.date == date(2017, 5, 15)
+    assert len(album.sections) == 1
+    assert album.sections[0].name == "photos"
 
 
 def test_read_incomplete_album_info(testing_gallery):
@@ -48,7 +50,7 @@ def test_read_photos(testing_gallery):
         ("Photo4.jpg", "Long caption", "Long caption with hidden part")
     ]
     for photo, (name, short_caption, long_caption) in \
-            zip(album.photos, expected_photos):
+            zip(album.sections[0].photos, expected_photos):
         assert photo.name == name
         assert photo.short_caption == short_caption
         assert photo.long_caption == long_caption

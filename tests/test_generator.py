@@ -6,7 +6,7 @@ import pytest
 import imagesize
 
 from kaleidoscope import renderer, generator
-from kaleidoscope.model import Album, Gallery, Photo
+from kaleidoscope.model import Gallery, Album, Section, Photo
 from kaleidoscope.generator import generate, DefaultListener
 
 
@@ -89,7 +89,7 @@ def test_resize_existing(tmpdir, gallery_with_one_photo):
 def test_resized_images_metadata(tmpdir, gallery_with_one_photo):
     """Generator should fill resized images metadata in the Photo."""
     generate(gallery_with_one_photo, str(tmpdir))
-    photo = gallery_with_one_photo.albums[0].photos[0]
+    photo = next(gallery_with_one_photo.albums[0].photos)
     assert photo.thumb.url == "thumb/photo.jpg"
     assert photo.thumb.size <= (300, 200)
     assert photo.large.url == "large/photo.jpg"
@@ -143,7 +143,7 @@ def test_counting_photos_to_resize(
 def gallery_with_one_photo():
     photo_path = os.path.join(os.path.dirname(__file__), 'data', 'photo.jpg')
     photo = Photo("photo.jpg", "", "", photo_path)
-    album = Album("album", "The Album", date(2017, 6, 24), [photo])
+    album = Album("album", "The Album", date(2017, 6, 24), [Section("photos", [photo])])
     return Gallery("Testin Gallery", "The Tester", [album])
 
 
@@ -151,7 +151,7 @@ def gallery_with_one_photo():
 def gallery_with_three_photos():
     photo_path = os.path.join(os.path.dirname(__file__), 'data', 'photo.jpg')
     photos = [Photo("f%d.jpg" % (i,), "", "", photo_path) for i in range(3)]
-    album = Album("album", "The Album", date(2017, 6, 24), photos)
+    album = Album("album", "The Album", date(2017, 6, 24), [Section("photos", photos)])
     return Gallery("Testing Gallery", "The Tester", [album])
 
 

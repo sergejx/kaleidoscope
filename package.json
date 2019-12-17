@@ -6,6 +6,7 @@
     "photoswipe": "4.1.2"
   },
   "devDependencies": {
+    "babel-brunch": "^7.0.1",
     "brunch": "^2.4.0",
     "copyfilemon-brunch": "^3.3.0",
     "less-brunch": "^2.10.0",
