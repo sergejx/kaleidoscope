@@ -1,23 +1,21 @@
-'use strict'
+import PhotoSwipe from "photoswipe/dist/photoswipe";
+import PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default";
 
-var PhotoSwipe = require('photoswipe/dist/photoswipe')
-var PhotoSwipeUI_Default = require('photoswipe/dist/photoswipe-ui-default')
-
-module.exports = {
+export default {
     init: init
-}
+};
 
 function init(thumbnails) {
-    var items = collectItems(thumbnails)
-    var pswp = document.querySelector('.pswp')
+    var items = collectItems(thumbnails);
+    var pswp = document.querySelector('.pswp');
     for (var i = 0; i < thumbnails.length; i++) {
-        bind(thumbnails, i, items, pswp)
+        bind(thumbnails, i, items, pswp);
     }
 }
 
 function collectItems(thumbnails) {
     return Array.prototype.map.call(thumbnails, function(thumbnail) {
-        var img = thumbnail.firstElementChild
+        var img = thumbnail.firstElementChild;
         return {
             src: thumbnail.getAttribute('href'),
             msrc: img.getAttribute('src'),
@@ -25,12 +23,12 @@ function collectItems(thumbnails) {
             w: img.dataset.fullWidth,
             h: img.dataset.fullHeight
         }
-    })
+    });
 }
 
 function bind(thumbnails, i, items, pswp) {
     thumbnails[i].addEventListener('click', function (event) {
-        event.preventDefault()
+        event.preventDefault();
         var options = {
             index: i,
             bgOpacity: 0.85,
@@ -42,6 +40,6 @@ function bind(thumbnails, i, items, pswp) {
                 }
             }
         };
-        new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options).init()
+        new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options).init();
     })
 }

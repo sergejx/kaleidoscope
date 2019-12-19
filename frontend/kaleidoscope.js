@@ -1,7 +1,5 @@
-'use strict'
-
-const justifiedLayout = require('justified-layout');
-const photoswipe = require('frontend/photoswipe');
+import justifiedLayout from "justified-layout";
+import photoswipe from "frontend/photoswipe";
 
 const layoutConfig = {
     boxSpacing: 10,
