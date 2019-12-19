@@ -4,9 +4,16 @@ import photoswipe from "frontend/photoswipe";
 const layoutConfig = {
     boxSpacing: 10,
     containerPadding: 15,
-    targetRowHeight: 176,
     targetRowHeightTolerance: 0.25
 };
+
+function targetRowHeight(containerWidth) {
+    if (containerWidth < 420)
+        return 142;
+    else
+        return 176;
+
+}
 
 function init() {
     const allThumbnails = [];
@@ -52,6 +59,7 @@ class Layout {
 
     computeLayout(container) {
         layoutConfig.containerWidth = container.offsetWidth;
+        layoutConfig.targetRowHeight = targetRowHeight(layoutConfig.containerWidth);
         const geometry = justifiedLayout(this.imagesInfo, layoutConfig);
         container.style.height = inPx(geometry.containerHeight);
         return geometry;
