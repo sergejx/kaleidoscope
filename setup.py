@@ -6,6 +6,7 @@ setup(
     packages=['kaleidoscope'],
     include_package_data=True,
     install_requires=[
+        'Click',
         'Jinja2',
         'imagesize',
         'tqdm',
@@ -14,6 +15,6 @@ setup(
     tests_require=['pytest'],
     entry_points='''
         [console_scripts]
-        kaleidoscope=kaleidoscope.cli:main
+        kaleidoscope=kaleidoscope.cli:cli
     ''',
 )
