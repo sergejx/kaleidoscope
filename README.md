@@ -45,13 +45,14 @@ https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
 
 ## Development ##
 
+Kaleidoscope uses [Poetry](https://python-poetry.org/) for packaging and
+managing dependencies 
+
     git clone https://github.com/sergejx/kaleidoscope.git
     cd kaleidoscope
-    python3 -m venv venv        # Creata virtualenv (or use virtualenvwrapper)
-    . venv/bin/activate
-    pip install --editable .    # Install Kaleidoscope in development mode
-    npm install                 # Install JS dependencies
-    npm run brunch build        # Build JS and CSS into kaleidoscope/assets
+    poetry install          # Install Python dependencies
+    npm install             # Install JS dependencies
+    npm run brunch build    # Build JS and CSS into kaleidoscope/assets
 
 ## History ##
 
