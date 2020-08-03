@@ -18,7 +18,7 @@
             <div class="album">
             {% for photo in section.photos %}
                 <a href="{{ photo.large.url }}" class="thumbnail">
-                    <img class="thumbnail__image" rel="album"
+                    <img class="thumbnail__image" rel="album" loading="lazy"
                          src="{{ photo.thumb.url }}"
                          alt="{{ photo.short_caption }}" data-description="{{ photo.long_caption }}"
                          width="{{ photo.thumb.size[0] }}" height="{{ photo.thumb.size[1] }}"
