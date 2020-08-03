@@ -14,7 +14,9 @@
 {% block content %}
     <div class="main">
         {% for section in album.sections %}
-            <h2 class="section-title">{{ section.name }}</h2>
+            {% if not section.is_default() %}
+                <h2 class="section-title">{{ section.name }}</h2>
+            {% endif %}
             <div class="album">
             {% for photo in section.photos %}
                 <a href="{{ photo.large.url }}" class="thumbnail">

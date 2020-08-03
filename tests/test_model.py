@@ -19,3 +19,13 @@ def test_group_albums_by_year():
         (2016, [album_16_1]),
         (2015, [album_15_2, album_15_1]),
     ]
+
+
+def test_default_album_section():
+    section = model.Section(name="photos", photos=[])
+    assert section.is_default() is True
+
+
+def test_non_default_album_section():
+    section = model.Section(name="My Section", photos=[])
+    assert section.is_default() is False

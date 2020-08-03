@@ -51,6 +51,9 @@ class Section:
     name: str
     photos: List[Photo]
 
+    def is_default(self):
+        return self.name == 'photos'
+
 
 @dataclass
 class Photo:
